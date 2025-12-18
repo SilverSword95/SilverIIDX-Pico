@@ -36,6 +36,9 @@
 #define HALL_KEY_NUM 7
 #define HALL_KEY_MUX_MAP { 4, 5, 3, 6, 2, 0, 1 }
 
+#define ESPLINK_TX 16
+#define ESPLINK_RX 17
+
 #else
 
 #endif

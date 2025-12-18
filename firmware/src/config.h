@@ -34,6 +34,7 @@ typedef struct __attribute ((packed)) {
     } sensor;
     struct {
         bool konami; /* konami spoof */
+		bool ps; /* playstation spoof */
         uint8_t res;
     } hid;
     uint8_t profile;

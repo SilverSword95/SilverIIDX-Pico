@@ -51,19 +51,6 @@ uint32_t rgb_gamma_fix(uint32_t rgb)
     return RGB32(r, g, b);
 }
 
-uint32_t rgb_apply_level(uint32_t rgb, uint8_t level)
-{
-    int r = (rgb >> 16) & 0xff;
-    int g = (rgb >> 8) & 0xff;
-    int b = (rgb >> 0) & 0xff;
-
-    r = r * level / 255;
-    g = g * level / 255;
-    b = b * level / 255;
-
-    return RGB32(r, g, b);
-}
-
 static uint8_t hid_lights[BUTTON_RGB_NUM + 3];
 static uint8_t *tt_hid = hid_lights + BUTTON_RGB_NUM;
 static uint8_t hall_level[7];
@@ -139,7 +126,8 @@ static void prepare_buf()
     }
 
     for (int i = 0; i < iidx_cfg->rgb.tt.num; i++) {
-        uint8_t id = iidx_cfg->rgb.tt.reversed ? iidx_cfg->rgb.tt.num - i - 1 : i;
+        uint8_t id = (iidx_cfg->hid.konami || iidx_cfg->hid.ps) ? iidx_cfg->rgb.tt.num - i - 1 : i;
+		id = iidx_cfg->rgb.tt.reversed ? iidx_cfg->rgb.tt.num - id - 1 : id;
         uint32_t c = mix_level(tt_led_buf[id], PROFILE.level.tt);
         final_tt_buf[i] = fix_order(iidx_cfg->rgb.format.tt, c) << 8;
     }
@@ -219,9 +207,8 @@ void rgb_set_button_light(uint16_t buttons)
         uint16_t flag = 1 << i;
         hid_lights[i] = (buttons & flag) > 0 ? 0xff : 0;
     }
-
-    int light_mode = PROFILE_EX.key_light_mode % 4;
-
+	
+	int light_mode = PROFILE_EX.key_light_mode % 4;
     if (!hebtn_any_present() || (light_mode == 0)) {
         return;
     }

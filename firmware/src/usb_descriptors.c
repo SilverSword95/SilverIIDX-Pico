@@ -62,11 +62,17 @@ uint8_t const desc_hid_report_joy[] = {
     GAMECON_REPORT_DESC_LIGHTS
 };
 
+//PlayStation mode
+uint8_t const desc_hid_report_joy_ps[] = {
+    GAMECON_REPORT_DESC_JOYSTICK_PS,
+    GAMECON_REPORT_DESC_LIGHTS
+};
+
 // Invoked when received GET HID REPORT DESCRIPTOR
 // Application return pointer to descriptor
 // Descriptor contents must exist long enough for transfer to complete
 uint8_t const* tud_hid_descriptor_report_cb(uint8_t itf) {
-    return desc_hid_report_joy;
+	return (joy_mode_check ? desc_hid_report_joy : desc_hid_report_joy_ps);
 }
 
 //--------------------------------------------------------------------+
@@ -99,11 +105,28 @@ uint8_t const desc_configuration_joy[] = {
 
     };
 
+uint8_t const desc_configuration_joy_ps[] = {
+    // Config number, interface count, string index, total length, attribute,
+    // power in mA
+    TUD_CONFIG_DESCRIPTOR(1, ITF_NUM_TOTAL, 0, CONFIG_TOTAL_LEN,
+                          TUSB_DESC_CONFIG_ATT_REMOTE_WAKEUP, 100),
+
+    // Interface number, string index, protocol, report descriptor len, EP In
+    // address, size & polling interval
+    TUD_HID_DESCRIPTOR(ITF_NUM_HID, 0, HID_ITF_PROTOCOL_NONE,
+                       sizeof(desc_hid_report_joy_ps), EPNUM_HID,
+                       CFG_TUD_HID_EP_BUFSIZE, 1),
+    
+    TUD_CDC_DESCRIPTOR(ITF_NUM_CDC, 4, EPNUM_CDC_NOTIF,
+                       8, EPNUM_CDC_OUT, EPNUM_CDC_IN, 64)
+
+    };
+
 // Invoked when received GET CONFIGURATION DESCRIPTOR
 // Application return pointer to descriptor
 // Descriptor contents must exist long enough for transfer to complete
 uint8_t const* tud_descriptor_configuration_cb(uint8_t index) {
-  return desc_configuration_joy;
+  return (joy_mode_check ? desc_configuration_joy : desc_configuration_joy_ps);
 }
 
 //--------------------------------------------------------------------+
@@ -113,10 +136,10 @@ static char serial_number_str[24] = "123456\0";
 
 const char *string_desc_arr[] = {
     (const char[]){0x09, 0x04},  // 0: is supported language is English (0x0409)
-    "WHowe"       ,              // 1: Manufacturer
-    "IIDX Pico Controller",      // 2: Product
+    "SilverSword"       ,              // 1: Manufacturer
+    "SilverIIDX Pico Controller",      // 2: Product
     serial_number_str,           // 3: Serials, should use chip ID
-    "IIDX Pico CLI Port",
+    "SilverIIDX Pico CLI Port",
     "Button 1",
     "Button 2",
     "Button 3",
@@ -175,4 +198,12 @@ void switch_to_konami_mode()
     desc_device_joy.idProduct = 0x8048;
     string_desc_arr[1] = "Konami Amusement";
     string_desc_arr[2] = "beatmania IIDX controller premium model";
+}
+
+void switch_to_ps_mode()
+{
+    desc_device_joy.idVendor = 0x054c;
+    desc_device_joy.idProduct = 0x09cc;
+    string_desc_arr[1] = "Sony Computer Entertainment";
+    string_desc_arr[2] = "Wireless Controller";
 }

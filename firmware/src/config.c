@@ -16,11 +16,12 @@ static iidx_cfg_t default_cfg = {
 
     .sensor = {
         .reversed = 0,
-        .ppr = 1,
+        .ppr = 0,
     },
 
     .hid = {
         .konami = 0,
+		.ps = 0,
     },
 
     .profile = 0,
@@ -77,25 +78,25 @@ static iidx_cfg_t default_cfg = {
 
     .hall = {
         .calibrated = { .up = { 3600, 3600, 3600, 3600, 3600, 3600, 3600 },
-                        .down = { 2100, 2100, 2100, 2100, 2100, 2100, 2100 },
+                        .down = { 1700, 1700, 1700, 1700, 1700, 1700, 1700 },
                       }
     },
 
     .profile_ex = { {
-            .trigger = { .on = { 24, 24, 24, 24, 24, 24, 24 },
-                         .off = { 18, 18, 18, 18, 18, 18, 18 }
+            .trigger = { .on = { 32, 32, 32, 32, 32, 32, 32 },
+                         .off = { 20, 20, 20, 20, 20, 20, 20 }
                        },
         }, {
             .trigger = { .on = { 32, 32, 32, 32, 32, 32, 32 },
-                         .off = { 18, 18, 18, 18, 18, 18, 18 }
+                         .off = { 20, 20, 20, 20, 20, 20, 20 }
                        },
         }, {
-            .trigger = { .on = { 16, 16, 16, 16, 16, 16, 16 },
-                         .off = { 18, 18, 18, 18, 18, 18, 18 }
+            .trigger = { .on = { 32, 32, 32, 32, 32, 32, 32 },
+                         .off = { 20, 20, 20, 20, 20, 20, 20 }
                        },
         }, {
-            .trigger = { .on = { 8, 8, 8, 8, 8, 8, 8 },
-                         .off = { 18, 18, 18, 18, 18, 18, 18 }
+            .trigger = { .on = { 32, 32, 32, 32, 32, 32, 32 },
+                         .off = { 20, 20, 20, 20, 20, 20, 20 }
                        },
         }
     }
@@ -110,13 +111,13 @@ iidx_runtime_t iidx_runtime = {
 static void config_loaded()
 {
     if (iidx_cfg->rgb.tt.num == 0) {
-        iidx_cfg->rgb.tt.num = 24;
+        iidx_cfg->rgb.tt.num = 29;
         config_changed();
     }
     if ((iidx_cfg->rgb.tt.start > 8) ||
         (iidx_cfg->rgb.tt.start + iidx_cfg->rgb.tt.num > 128)) {
         iidx_cfg->rgb.tt.start = 0;
-        iidx_cfg->rgb.tt.num = 24;
+        iidx_cfg->rgb.tt.num = 29;
         config_changed();
     }
     if (iidx_cfg->sensor.ppr > 7) {

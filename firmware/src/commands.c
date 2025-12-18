@@ -35,12 +35,13 @@ static void disp_rgb()
 
 static void disp_sensor()
 {
-    const uint16_t ppr[8] = { 200, 128, 64, 32, 256, 160, 96, 48};
+    const uint16_t ppr[8] = { 256, 128, 64, 32, 512, 200, 96, 48};
     printf("[TURNTABLE]\n");
-    printf("  Sensor: %s\n", turntable_sensor_name());
+	printf("  Sensor: %s\n", turntable_sensor_name());
     printf("  PPR: %d\n", ppr[iidx_cfg->sensor.ppr & 7]);
     printf("  Reversed: %d\n", iidx_cfg->sensor.reversed);
     printf("  Binary/LR Mode: %s\n", iidx_cfg->sensor.binary ? "Yes" : "No");
+
 }
 
 static void disp_hall()

@@ -35,18 +35,18 @@ static void init_port(bool use_primary)
         i2c_scl = TT_SENSOR_SCL;
         i2c_sda = TT_SENSOR_SDA;
     } else {
-        sensor_i2c = TT_SENSOR_I2C_2;
+		sensor_i2c = TT_SENSOR_I2C_2;
         i2c_scl = TT_SENSOR_SCL_2;
         i2c_sda = TT_SENSOR_SDA_2;
     }
-
-    gpio_init(i2c_scl);
-    gpio_init(i2c_sda);
+	
+	gpio_init(i2c_scl);
+	gpio_init(i2c_sda);
     gpio_set_function(i2c_scl, GPIO_FUNC_I2C);
     gpio_set_function(i2c_sda, GPIO_FUNC_I2C);
     gpio_pull_up(i2c_scl);
     gpio_pull_up(i2c_sda);
-
+	
     i2c_init(sensor_i2c, TT_SENSOR_I2C_FREQ);
 }
 
@@ -59,21 +59,20 @@ static void deinit_port()
 
 static bool identify_sensor()
 {
-    sensor_identified = false;
-
+	sensor_identified = false;
+	
     tmag5273_init(0, sensor_i2c);
     if (tmag5273_is_present(0)) {
         tmag5273_use(0);
         tmag5273_init_sensor();
         sensor_is_as5600 = false;
-        sensor_identified = true;
+		sensor_identified = true;
         return true;
     }
-
     as5600_init(sensor_i2c);
     if (as5600_is_present(sensor_i2c)) {
         sensor_is_as5600 = true;
-        sensor_identified = true;
+		sensor_identified = true;
         return true;
     }
     return false;
@@ -132,8 +131,9 @@ void turntable_update()
     }
 
     int angle = sum / count;
-    
-    raw_angle = iidx_cfg->sensor.reversed ? (4095 - angle) : angle;
+	
+	raw_angle = (iidx_cfg->hid.konami || iidx_cfg->hid.ps) ? (4095 - angle) : angle;
+	raw_angle = iidx_cfg->sensor.reversed ? (4095 - raw_angle) : raw_angle;
 }
 
 uint16_t turntable_raw()
@@ -153,7 +153,7 @@ uint8_t turntable_read()
         delta += 4096;
     }
 
-    const uint16_t divs[8] = { 200, 128, 64, 32, 256, 160, 96, 48};
+    const uint16_t divs[8] = { 256, 128, 64, 32, 512, 200, 96, 48};
     uint16_t step = 4096 / divs[iidx_cfg->sensor.ppr & 7];
 
     if (abs(delta) >= step) {
