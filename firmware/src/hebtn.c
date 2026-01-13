@@ -20,6 +20,8 @@
 
 #define KEY_NUM HALL_KEY_NUM
 
+#define HALL_PRESENCE_THRESHOLD 500 // about 0.4V on 3.3V reference
+
 static bool hebtn_presence[KEY_NUM];
 static bool hebtn_any_presence = false;
 static uint16_t reading[KEY_NUM];
@@ -28,10 +30,10 @@ static bool key_actuated[KEY_NUM];
 static void hebtn_discovery()
 {
     hebtn_update();
-    hebtn_any_presence = false;
+	hebtn_any_presence = false;
     for (int i = 0; i < KEY_NUM; i++) {
-        hebtn_presence[i] = (reading[i] > 200);
-        hebtn_any_presence |= hebtn_presence[i];
+        hebtn_presence[i] = (reading[i] > HALL_PRESENCE_THRESHOLD);
+		hebtn_any_presence |= hebtn_presence[i];
     }
 }
 
@@ -70,7 +72,7 @@ uint8_t hebtn_keynum()
 
 bool hebtn_any_present()
 {
-    return hebtn_any_presence;
+    return !iidx_cfg->hall.suppressed && hebtn_any_presence;
 }
 
 bool hebtn_present(uint8_t chn)
@@ -78,7 +80,7 @@ bool hebtn_present(uint8_t chn)
     if (chn >= KEY_NUM) {
         return false;
     }
-    return hebtn_presence[chn];
+    return !iidx_cfg->hall.suppressed && hebtn_presence[chn];
 }
 
 uint32_t hebtn_presence_map()
@@ -230,9 +232,9 @@ uint8_t hebtn_trigger_byte(uint8_t chn)
         return 0;
     }
     int trig = PROFILE_EX.trigger.on[chn] % 36 + 1;
-
     return trig * 255 / 37;
 }
+
 
 static void read_sensors_avg(uint16_t avg[KEY_NUM])
 {

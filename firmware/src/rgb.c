@@ -291,6 +291,10 @@ static uint32_t calc_button_light(int key)
 {
     uint32_t rgb_on = rgb_from_hsv(PROFILE.key_on[key].hsv);
     uint32_t rgb_off = rgb_from_hsv(PROFILE.key_off[key].hsv);
+	
+	if (time_us_64() < hid_light_button_expire) {
+        return rgb_transit(rgb_off, rgb_on, hid_lights[key]);
+    }
 
     int light_mode = PROFILE_EX.key_light_mode % 4;
 
